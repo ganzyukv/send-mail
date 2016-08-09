@@ -6,22 +6,25 @@ class MessageTest extends PHPUnit_Framework_TestCase
     /**
      * @var Message
      */
-    public $message = null;
+    public $body;
 
     public function setUp()
     {
-        $this->message = new Message();
+        $client = new GuzzleHttp\Client();
+        $request = $client->createRequest('POST');
+        $body = $request->getBody();
+        $this->body = new Message($body);
     }
 
 
     public function testCheckMessageIsTrue()
     {
-        $this->message->to = 'to';
-        $this->message->send_type = 'now';
-        $this->message->subject = 'subject';
-        $this->message->html = 'html';
+        $this->body->setField('to', 'email@email.com');
+        $this->body->setField('send_type', 'now');
+        $this->body->setField('subject', 'subject');
+        $this->body->setField('html', 'Message body');
         /* ожидаем, что $m->checkMessage() возвращает true */
-        $this->assertTrue($this->message->checkMessage() === true);
+        $this->assertTrue($this->body->checkMessage() === true);
     }
 
     /**
@@ -30,7 +33,7 @@ class MessageTest extends PHPUnit_Framework_TestCase
      */
     public function testCheckMessageInvalidParameter()
     {
-        $this->message->to_this = '';
+        $this->body->to_this = '';
         $this->fail('An expected exception has not been raised in test block  CheckMessageInvalidParameter.');
     }
 
@@ -40,10 +43,10 @@ class MessageTest extends PHPUnit_Framework_TestCase
      */
     public function testCheckMessageRequiredParameterException()
     {
-        $this->message->send_type = 'now';
-        $this->message->subject = 'subject';
-        $this->message->html = 'html';
-        $this->message->checkMessage();
+        $this->body->setField('send_type', 'now');
+        $this->body->setField('subject', 'subject');
+        $this->body->setField('html', 'Message body');
+        $this->body->checkMessage();
 
         $this->fail('An expected exception has not been raised An expected exception has not been raised in test block CheckMessageRequiredParameterException.');
     }
